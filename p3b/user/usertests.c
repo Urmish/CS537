@@ -1495,32 +1495,32 @@ main(int argc, char *argv[])
   //sbrktest();
   validatetest();
 
-  //opentest();
-  //writetest();
-  //writetest1();
-  //createtest();
+  opentest();
+  writetest();
+  writetest1();
+  createtest();
 
-  //mem();
-  //pipe1();
-  //preempt();
-  //exitwait();
+  mem();
+  pipe1();
+  preempt();
+  exitwait();
 
-  //rmdot();
-  //fourteen();
-  //bigfile();
-  //subdir();
-  //concreate();
-  //linktest();
-  //unlinkread();
-  //createdelete();
-  //twofiles();
-  //sharedfd();
-  //dirfile();
-  //iref();
-  //forktest();
-  //bigdir(); // slow
+  rmdot();
+  fourteen();
+  bigfile();
+  subdir();
+  concreate();
+  linktest();
+  unlinkread();
+  createdelete();
+  twofiles();
+  sharedfd();
+  dirfile();
+  iref();
+  forktest();
+  bigdir(); // slow
 
-  //exectest();
+  exectest();
 
   exit();
 }

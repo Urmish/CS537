@@ -130,20 +130,20 @@ fork(void)
   int i, pid;
   struct proc *np;
 
-  cprintf("\n*****LOKESH I am inside fork\n");//lokesh
+  //cprintf("\n*****LOKESH I am inside fork\n");//lokesh
   // Allocate process.
   if((np = allocproc()) == 0)
     return -1;
-  cprintf("\n*****LOKESH I am inside fork allocproc done! \n");//lokesh
+  //cprintf("\n*****LOKESH I am inside fork allocproc done! \n");//lokesh
 
   // Copy process state from p.
-  if((np->pgdir = copyuvm(proc->pgdir, proc->sz)) == 0){
+  if((np->pgdir = copyuvm(proc->pgdir, proc->sz, proc->stack_low)) == 0){
     kfree(np->kstack);
     np->kstack = 0;
     np->state = UNUSED;
     return -1;
   }
-  cprintf("\n*****LOKESH I am inside fork copyuvm done! \n");//lokesh
+  //cprintf("\n*****LOKESH I am inside fork copyuvm done! \n");//lokesh
   np->sz = proc->sz;
   np->parent = proc;
   *np->tf = *proc->tf;
@@ -159,6 +159,7 @@ fork(void)
   pid = np->pid;
   np->state = RUNNABLE;
   safestrcpy(np->name, proc->name, sizeof(proc->name));
+  //cprintf("\n*****LOKESH fork pid is %d\n",pid);//lokesh
   return pid;
 }
 
@@ -201,6 +202,7 @@ exit(void)
 
   // Jump into the scheduler, never to return.
   proc->state = ZOMBIE;
+  //cprintf("\nUrmish exit for proc %s",proc->name);
   sched();
   panic("zombie exit");
 }
@@ -214,6 +216,7 @@ wait(void)
   int havekids, pid;
 
   acquire(&ptable.lock);
+  //cprintf("Urmish in wait proc %s\n",proc->name);
   for(;;){
     // Scan through table looking for zombie children.
     havekids = 0;
@@ -240,6 +243,7 @@ wait(void)
     // No point waiting if we don't have any children.
     if(!havekids || proc->killed){
       release(&ptable.lock);
+      //cprintf("Urmish in wait bitiya nahi milat \n");
       return -1;
     }
 

@@ -101,8 +101,10 @@ sys_fstat(void)
   struct file *f;
   struct stat *st;
   
+  //cprintf("Urmish check fstat\n");
   if(argfd(0, 0, &f) < 0 || argptr(1, (void*)&st, sizeof(*st)) < 0)
     return -1;
+  //cprintf("Urmish check pass fstat\n");
   return filestat(f, st);
 }
 
@@ -262,8 +264,10 @@ sys_open(void)
   struct file *f;
   struct inode *ip;
 
+  //cprintf("Urmish - Calling open\n");
   if(argstr(0, &path) < 0 || argint(1, &omode) < 0)
     return -1;
+  //cprintf("Urmish - Check Pass\n");
   if(omode & O_CREATE){
     if((ip = create(path, T_FILE, 0, 0)) == 0)
       return -1;

@@ -22,6 +22,7 @@ sys_exit(void)
 int
 sys_wait(void)
 {
+  //cprintf("\n Urmish in wait %s",proc->name);
   return wait();
 }
 

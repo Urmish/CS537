@@ -207,7 +207,6 @@ loaduvm(pde_t *pgdir, char *addr, struct inode *ip, uint offset, uint sz)
   uint i, pa, n;
   pte_t *pte;
 
-  cprintf("\nUrmish loaduvm %p",addr);
   if((uint)addr % PGSIZE != 0)
     panic("loaduvm: addr must be page aligned");
   for(i = 0; i < sz; i += PGSIZE){
@@ -232,7 +231,6 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
   char *mem;
   uint a;
 
-  cprintf("\nUrmish- allocuvm Called");
   if(newsz > USERTOP)
     return 0;
   if(newsz < oldsz)
@@ -265,7 +263,6 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
   if(newsz >= oldsz)
     return oldsz;
 
-  cprintf("\nUrmish- deallocuvm Called");
   a = PGROUNDUP(newsz);
   for(; a  < oldsz; a += PGSIZE){
     pte = walkpgdir(pgdir, (char*)a, 0);
@@ -287,7 +284,6 @@ freevm(pde_t *pgdir)
 {
   uint i;
 
-  cprintf("\nUrmish- freeuvm Called");
   if(pgdir == 0)
     panic("freevm: no pgdir");
   deallocuvm(pgdir, USERTOP, 0);
@@ -301,14 +297,13 @@ freevm(pde_t *pgdir)
 // Given a parent process's page table, create a copy
 // of it for a child.
 pde_t*
-copyuvm(pde_t *pgdir, uint sz)
+copyuvm(pde_t *pgdir, uint sz, uint stack_low)
 {
   pde_t *d;
   pte_t *pte;
   uint pa, i;
   char *mem;
 
-  //cprintf("\nUrmish- copyuvm Called");
   if((d = setupkvm()) == 0)
     return 0;
   for(i = PGSIZE; i < sz; i += PGSIZE){
@@ -323,6 +318,19 @@ copyuvm(pde_t *pgdir, uint sz)
     if(mappages(d, (void*)i, PGSIZE, PADDR(mem), PTE_W|PTE_U) < 0)
       goto bad;
   }
+  for(i = stack_low; i < USERTOP; i += PGSIZE){
+    if((pte = walkpgdir(pgdir, (void*)i, 0)) == 0)
+      panic("copyuvm: pte should exist");
+    if(!(*pte & PTE_P))
+      panic("copyuvm: page not present");
+    pa = PTE_ADDR(*pte);
+    if((mem = kalloc()) == 0)
+      goto bad;
+    memmove(mem, (char*)pa, PGSIZE);
+    if(mappages(d, (void*)i, PGSIZE, PADDR(mem), PTE_W|PTE_U) < 0)
+      goto bad;
+  }
+ 
   return d;
 
 bad:
@@ -335,7 +343,6 @@ char*
 uva2ka(pde_t *pgdir, char *uva)
 {
   pte_t *pte;
-  cprintf("\nUrmish - uva is %p", uva);
   pte = walkpgdir(pgdir, uva, 0);
   if((*pte & PTE_P) == 0)
     return 0;
@@ -353,7 +360,6 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   char *buf, *pa0;
   uint n, va0;
   
-  cprintf("\nUrmish- copyout Called");
   buf = (char*)p;
   while(len > 0){
     va0 = (uint)PGROUNDDOWN(va);

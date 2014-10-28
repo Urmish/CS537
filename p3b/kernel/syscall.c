@@ -17,9 +17,13 @@
 int
 fetchint(struct proc *p, uint addr, int *ip)
 {
-  if(addr >= p->sz || addr+4 > p->sz)
+  //cprintf("\n Urmish - fetchint called by : %s \n",p->name);
+  //cprintf("\n Urmish - fetchint sz: %d addr: %d \n",p->sz,addr);
+  //if(addr < p->stack_low || addr > USERTOP || addr+4>USERTOP)
+  if(!((addr > PGSIZE && addr < p->sz && addr + 4 < p->sz) || (addr > p->stack_low && addr < USERTOP && addr+4<USERTOP)))
     return -1;
   *ip = *(int*)(addr);
+  //cprintf("\n Urmish - ip is %d \n",*ip);
   return 0;
 }
 
@@ -31,10 +35,20 @@ fetchstr(struct proc *p, uint addr, char **pp)
 {
   char *s, *ep;
 
-  if(addr >= p->sz)
+  if(addr >= USERTOP)
     return -1;
   *pp = (char*)addr;
-  ep = (char*)p->sz;
+  //Added by Urmish
+  if (addr < p->sz)
+  {
+      ep = (char*)p->sz;
+  }
+  else if (addr < USERTOP && addr > p->stack_low)
+  {
+      ep = (char*)USERTOP;
+  }
+  //cprintf("\n Urmish - fetchstr called by : %s \n",p->name);
+  //cprintf("\n Urmish - fetchstr sz: %d addr: %d\n",p->sz,addr);
   for(s = *pp; s < ep; s++)
     if(*s == 0)
       return s - *pp;
@@ -45,6 +59,8 @@ fetchstr(struct proc *p, uint addr, char **pp)
 int
 argint(int n, int *ip)
 {
+  //cprintf("\n Urmish - argint called by : %s \n",proc->name);
+  //cprintf("\n Urmish - argint ip: %p n: %d \n",ip,n);
   return fetchint(proc, proc->tf->esp + 4 + 4*n, ip);
 }
 
@@ -56,9 +72,12 @@ argptr(int n, char **pp, int size)
 {
   int i;
   
+  //cprintf("\n Urmish - argptr called by : %s \n",proc->name);
+  //cprintf("\n Urmish - argptr n: %d, size:%d \n",n,size);
   if(argint(n, &i) < 0)
     return -1;
-  if((uint)i >= proc->sz || (uint)i+size > proc->sz)
+  //cprintf("\n Urmish - argptr i \n",i);
+  if((uint)i >= USERTOP || (uint)i+size > USERTOP) //Urmish Change here`
     return -1;
   *pp = (char*)i;
   return 0;
@@ -71,6 +90,8 @@ argptr(int n, char **pp, int size)
 int
 argstr(int n, char **pp)
 {
+  //cprintf("\n Urmish - argstr called by : %s",proc->name);
+  //cprintf("\n Urmish - argstr n: %d",n);
   int addr;
   if(argint(n, &addr) < 0)
     return -1;
