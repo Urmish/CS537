@@ -1250,7 +1250,9 @@ sbrktest(void)
   // can one sbrk() less than a page?
   a = sbrk(0);
   int i;
+  printf(stdout, "sbrk - after sbrk(0)\n");
   for(i = 0; i < 5000; i++){
+    //printf(stdout, "sbrk - in sbrk i = %d\n",i);
     b = sbrk(1);
     if(b != a){
       printf(stdout, "sbrk test failed %d %x %x\n", i, a, b);
@@ -1259,7 +1261,9 @@ sbrktest(void)
     *b = 1;
     a = b + 1;
   }
+  printf(stdout, "sbrk - in sbrk forking\n");
   pid = fork();
+  printf(stdout, "sbrk - after sbrk forking\n");
   if(pid < 0){
     printf(stdout, "sbrk test fork failed\n");
     exit();
@@ -1275,9 +1279,12 @@ sbrktest(void)
   wait();
 
   // can one allocate the full 640K?
+  printf(stdout, "sbrk - giving 640k - 0\n");
   a = sbrk(0);
   amt = (640 * 1024) - (uint)a;
+  printf(stdout, "sbrk - giving 640k\n");
   p = sbrk(amt);
+  printf(stdout, "sbrk - giving done for 640k\n");
   if(p != a){
     printf(stdout, "sbrk test failed 640K test, p %x a %x\n", p, a);
     exit();
@@ -1286,6 +1293,7 @@ sbrktest(void)
   *lastaddr = 99;
 
   // is one forbidden from allocating more than 640K?
+  printf(stdout, "sbrk - in forbidden\n");
   c = sbrk(4096);
   if(c != (char*)0xffffffff){
     printf(stdout, "sbrk allocated more than 640K, c %x\n", c);
@@ -1490,10 +1498,10 @@ main(int argc, char *argv[])
   }
   close(open("usertests.ran", O_CREATE));
 
-  //bigargtest();
-  //bsstest();
-  //sbrktest();
-  validatetest();
+  bigargtest();
+  bsstest();
+  sbrktest();
+  //validatetest();
 
   opentest();
   writetest();

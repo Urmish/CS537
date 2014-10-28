@@ -34,6 +34,30 @@ idtinit(void)
 void
 trap(struct trapframe *tf)
 {
+  if(tf->trapno == 14)
+  {
+      uint addr = rcr2();
+      cprintf ("\nUrmish - Trap - Called by addr %x",addr);
+      if (! (addr < PGSIZE))
+      {
+          if ( (proc->stack_low - addr) < PGSIZE )
+          {
+              cprintf ("\nUrmish - Trap - Stack badha mkl");
+              if ((proc->stack_low - proc->sz - PGSIZE) > PGSIZE)
+              {
+                  if(!allocuvm(proc->pgdir, proc->stack_low - PGSIZE, proc->stack_low))
+                  {
+                      cprintf("\nTrap: KILLED Process as allocuvm failed"); 
+                  }
+                  else
+                  {
+                      return;
+                  }
+              }
+          }
+      }   
+  }
+  
   if(tf->trapno == T_SYSCALL){
     if(proc->killed)
       exit();

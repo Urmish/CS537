@@ -9,6 +9,7 @@
 int
 exec(char *path, char **argv)
 {
+  //cprintf ("EXEC called!!!\n");
   char *s, *last;
   int i, off;
   uint argc, sz, sp, ustack[3+MAXARG+1];
@@ -41,7 +42,9 @@ exec(char *path, char **argv)
     if(ph.memsz < ph.filesz)
       goto bad;
     if((sz = allocuvm(pgdir, sz, ph.va + ph.memsz)) == 0)
+    {
       goto bad;
+    }
     if(loaduvm(pgdir, (char*)ph.va, ip, ph.offset, ph.filesz) < 0)
       goto bad;
   }

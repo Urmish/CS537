@@ -45,6 +45,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  //p->stack_low = USERTOP;
   release(&ptable.lock);
 
   // Allocate kernel stack if possible.
@@ -107,7 +108,14 @@ int
 growproc(int n)
 {
   uint sz;
-  
+
+  //cprintf("Urmish - proc->stack_low = %d proc->sz = %d n = %d value = %d PGSIZE = %d\n", proc->stack_low, proc->sz, n, proc->stack_low - proc->sz -n, PGSIZE);
+  if ((int)(proc->stack_low - proc->sz -n) < PGSIZE) 
+  {
+    //cprintf("Urmish - Ee na de payi bhaiya!!\n");
+    return -1;
+  }
+  //cprintf("Urmish - Diyat hai bhaiya\n");
   sz = proc->sz;
   if(n > 0){
     if((sz = allocuvm(proc->pgdir, sz, sz + n)) == 0)
@@ -127,14 +135,16 @@ growproc(int n)
 int
 fork(void)
 {
+  //cprintf("FORK called!!!\n");
   int i, pid;
   struct proc *np;
 
-  //cprintf("\n*****LOKESH I am inside fork\n");//lokesh
+  ////cprintf("\n*****LOKESH I am inside fork\n");//lokesh
   // Allocate process.
   if((np = allocproc()) == 0)
     return -1;
-  //cprintf("\n*****LOKESH I am inside fork allocproc done! \n");//lokesh
+  //cprintf("FORK allocproc done!\n");
+  ////cprintf("\n*****LOKESH I am inside fork allocproc done! \n");//lokesh
 
   // Copy process state from p.
   if((np->pgdir = copyuvm(proc->pgdir, proc->sz, proc->stack_low)) == 0){
@@ -143,8 +153,10 @@ fork(void)
     np->state = UNUSED;
     return -1;
   }
-  //cprintf("\n*****LOKESH I am inside fork copyuvm done! \n");//lokesh
+  //cprintf("FORK copyuvm done!\n");
+  ////cprintf("\n*****LOKESH I am inside fork copyuvm done! \n");//lokesh
   np->sz = proc->sz;
+  np->stack_low = proc->stack_low;
   np->parent = proc;
   *np->tf = *proc->tf;
 
@@ -159,7 +171,7 @@ fork(void)
   pid = np->pid;
   np->state = RUNNABLE;
   safestrcpy(np->name, proc->name, sizeof(proc->name));
-  //cprintf("\n*****LOKESH fork pid is %d\n",pid);//lokesh
+  //cprintf("FORK DONE!!!\n");//lokesh
   return pid;
 }
 
