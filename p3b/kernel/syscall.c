@@ -76,10 +76,12 @@ argptr(int n, char **pp, int size)
   //cprintf("\n Urmish - argptr n: %d, size:%d \n",n,size);
   if(argint(n, &i) < 0)
     return -1;
-  //cprintf("\n Urmish - argptr i \n",i);
-  if((uint)i >= USERTOP || (uint)i+size > USERTOP) //Urmish Change here`
+  //cprintf("\n Urmish - argptr i %x size is %d\n",i, size);
+  if((uint)i >= USERTOP || (uint)i+size > USERTOP || (uint)i < PGSIZE) //WORKS for BOUNDS_ONE
+  //if((uint)i >= USERTOP || (uint)i+size > USERTOP || (uint)i < PGSIZE || (((uint)i > p->sz || (uint)i+4 > p->sz) && (uint)i < p->stack_low))
     return -1;
   *pp = (char*)i;
+  //cprintf("\n Urmish - returning 0 argptr i %x size is %d\n",i, size);
   return 0;
 }
 
