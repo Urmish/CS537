@@ -1,0 +1,14 @@
+Ctrl+a h for help
+/u/c/s/cs537-2/ta/tools/qemu -serial mon:stdio -hdb fs.img xv6.img -smp 2
+xv6...
+lapicinit: 1 0xfee00000
+cpu1: starting
+cpu0: starting
+******LOKESH init: starting sh
+
+*****LOKESH I am inside fork
+
+*****LOKESH I am inside fork allocproc done! 
+
+*****LOKESH I am inside fork copyuvm done! 
+$ 
