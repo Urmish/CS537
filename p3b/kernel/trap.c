@@ -37,20 +37,22 @@ trap(struct trapframe *tf)
   if(tf->trapno == 14)
   {
       uint addr = rcr2();
-      cprintf ("\nUrmish - Trap - Called by addr %x",addr);
+      cprintf ("\nUrmish - Trap - Called by addr %d stack_low %d sz %d \n",addr,proc->stack_low, proc->sz);
       if (! (addr < PGSIZE))
       {
           if ( (proc->stack_low - addr) < PGSIZE )
           {
-              cprintf ("\nUrmish - Trap - Stack badha mkl");
-              if ((proc->stack_low - proc->sz - PGSIZE) > PGSIZE)
+              cprintf ("\nUrmish - Trap - Stack Increase Pass 1");
+              if ((proc->stack_low - proc->sz - PGSIZE) >= PGSIZE)
               {
+                  cprintf ("\nUrmish - Trap - Stack Increase Pass 2");
                   if(!allocuvm(proc->pgdir, proc->stack_low - PGSIZE, proc->stack_low))
                   {
                       cprintf("\nTrap: KILLED Process as allocuvm failed"); 
                   }
                   else
                   {
+                      proc->stack_low = proc->stack_low-PGSIZE;
                       return;
                   }
               }

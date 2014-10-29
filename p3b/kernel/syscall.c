@@ -20,7 +20,7 @@ fetchint(struct proc *p, uint addr, int *ip)
   //cprintf("\n Urmish - fetchint called by : %s \n",p->name);
   //cprintf("\n Urmish - fetchint sz: %d addr: %d \n",p->sz,addr);
   //if(addr < p->stack_low || addr > USERTOP || addr+4>USERTOP)
-  if(!((addr > PGSIZE && addr < p->sz && addr + 4 < p->sz) || (addr > p->stack_low && addr < USERTOP && addr+4<USERTOP)))
+  if(!((addr >= PGSIZE && addr <= p->sz && addr + 4 <= p->sz) || (addr >= p->stack_low && addr <= USERTOP && addr+4<USERTOP)))
     return -1;
   *ip = *(int*)(addr);
   //cprintf("\n Urmish - ip is %d \n",*ip);
@@ -39,11 +39,11 @@ fetchstr(struct proc *p, uint addr, char **pp)
     return -1;
   *pp = (char*)addr;
   //Added by Urmish
-  if (addr < p->sz)
+  if (addr < p->sz && addr > PGSIZE)
   {
       ep = (char*)p->sz;
   }
-  else if (addr < USERTOP && addr > p->stack_low)
+  else if (addr < USERTOP && addr >= p->stack_low)
   {
       ep = (char*)USERTOP;
   }
