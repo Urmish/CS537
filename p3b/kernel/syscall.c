@@ -77,8 +77,8 @@ argptr(int n, char **pp, int size)
   if(argint(n, &i) < 0)
     return -1;
   //cprintf("\n Urmish - argptr i %x size is %d\n",i, size);
-  if((uint)i >= USERTOP || (uint)i+size > USERTOP || (uint)i < PGSIZE) //WORKS for BOUNDS_ONE
-  //if((uint)i >= USERTOP || (uint)i+size > USERTOP || (uint)i < PGSIZE || (((uint)i > p->sz || (uint)i+4 > p->sz) && (uint)i < p->stack_low))
+  //if((uint)i >= USERTOP || (uint)i+size > USERTOP || (uint)i < PGSIZE) //WORKS for BOUNDS_ONE
+  if((uint)i >= USERTOP || (uint)i+size > USERTOP || (uint)i < PGSIZE || (((uint)i >= proc->sz || (uint)i+size > proc->sz) && (uint)i < proc->stack_low))
     return -1;
   *pp = (char*)i;
   //cprintf("\n Urmish - returning 0 argptr i %x size is %d\n",i, size);
