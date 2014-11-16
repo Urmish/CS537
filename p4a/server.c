@@ -94,7 +94,7 @@ void * child(void * dummy)
         requestHandle(connfd);
         //printf("CHILD: done handling request_0 %d\n", connfd);
 	Close(connfd);
-       // printf("CHILD: done handling request_1 %d\n", connfd);
+       //printf("CHILD: done handling request_1 %d\n", connfd);
     }
     return NULL;
 }
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
     listenfd = Open_listenfd(port);
     while (1) {
 	clientlen = sizeof(clientaddr);
-        //printf("Got a request\n");
+      //printf("Got a request\n");
 	connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
         
 	// 
