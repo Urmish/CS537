@@ -47,6 +47,7 @@ void put (int connfd)
 {
     int i=0;
     //write into buffer
+    //printf("PUT - connfd is %d\n",connfd);
     for(i=0; i < buffers; i++)
     {
         if (BUFFER[i] == -1)
@@ -87,11 +88,13 @@ void * child(void * dummy)
             pthread_cond_wait(&FILL, &MUTEX);
         }
         connfd = get();
+        //printf("GET_Apna - connfd is %d\n",connfd);
         pthread_cond_signal(&EMPTY);
         pthread_mutex_unlock (&MUTEX);
         requestHandle(connfd);
+        //printf("CHILD: done handling request_0 %d\n", connfd);
 	Close(connfd);
-        printf("CHILD: done handling request\n");
+       // printf("CHILD: done handling request_1 %d\n", connfd);
     }
     return NULL;
 }
@@ -131,9 +134,9 @@ int main(int argc, char *argv[])
     listenfd = Open_listenfd(port);
     while (1) {
 	clientlen = sizeof(clientaddr);
-        printf("Got a request\n");
+        //printf("Got a request\n");
 	connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
-
+        
 	// 
 	// CS537: In general, don't handle the request in the main thread.
 	// Save the relevant info in a buffer and have one of the worker threads 
