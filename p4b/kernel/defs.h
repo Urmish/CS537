@@ -112,6 +112,8 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
+int             proc_fdalloc(struct file *);
+
 
 // swtch.S
 void            swtch(struct context**, struct context*);

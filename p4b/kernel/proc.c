@@ -600,4 +600,36 @@ procdump(void)
   }
 }
 
-
+int proc_fdalloc(struct file *f)
+{
+  int fd;
+  if (proc->is_clone == 1 || proc->count_clone > 0)
+  {
+      acquire(&ptable.lock);
+  }
+  for(fd = 0; fd < NOFILE; fd++){
+    if(proc->ofile[fd] == 0){
+      proc->ofile[fd] = f;
+      if (proc->is_clone == 1 || proc->count_clone > 0)
+      {
+          struct proc *p;
+          for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+          {
+              if (p->pgdir == proc->pgdir)
+              {
+                  p->ofile[fd] = proc->ofile[fd];
+              }
+          }
+      release(&ptable.lock);
+      }
+      return fd;
+    }
+  }
+  
+  if (proc->is_clone == 1 || proc->count_clone > 0)
+  {
+  release(&ptable.lock);
+  }
+  return -1;
+ 
+}

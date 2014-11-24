@@ -33,15 +33,7 @@ argfd(int n, int *pfd, struct file **pf)
 static int
 fdalloc(struct file *f)
 {
-  int fd;
-
-  for(fd = 0; fd < NOFILE; fd++){
-    if(proc->ofile[fd] == 0){
-      proc->ofile[fd] = f;
-      return fd;
-    }
-  }
-  return -1;
+    return proc_fdalloc(f);
 }
 
 int
