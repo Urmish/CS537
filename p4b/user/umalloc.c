@@ -88,3 +88,28 @@ malloc(uint nbytes)
         return 0;
   }
 }
+
+int thread_create(void (*fn) (void *), void *arg)
+{
+    void *stack = malloc(4096);
+    int tid = clone(stack); 
+    if (tid < 0) 
+    {
+        printf(1,"error!\n");
+    }
+    else if (tid == 0) 
+    {
+        // child
+        fn(arg);
+        free(stack);
+        //printf(1,"\n****************** I am calling EXIT ************\n");
+        exit();  
+    } 
+    else 
+    {
+        //parent
+        return tid;
+    }
+    return 0;
+}
+

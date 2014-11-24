@@ -39,34 +39,45 @@
 
 int stack[4096] __attribute__ ((aligned (4096)));
 int x = 0;
+int lock_che = 0;
+void function (void * x)
+{
+
+int i =0;
+printf(1,"\nYo! I am the function!!!!! %d\n",x);
+    //while(1)
+    //{
+      lock(&lock_che);
+      for(;i < 10;i++) 
+      {
+        x++;
+        printf(1,"\nYo! I am the function!!!!! %d\n",x);
+        sleep(100);
+      }
+      unlock(&lock_che);
+    //}
+return ;
+}
 
 int main(int argc, char *argv[]) {
   printf(1, "Stack is at %p\n", stack);
   //int tid = fork();
-  int tid = clone(stack);
+  int tid = thread_create(function,(void*)5);
   printf(1,"tid is %d\n",tid);
 
   ////printf(1,"\nTRY TO PRINT THIS\n");
-
-  if (tid < 0) {
-    printf(1, "error!\n");
-  } 
-  ////else if (tid == getpid()) {
-  else if (tid == 0) {
-    // child
-  printf(1,"\nCHILD TRY TO PRINT THIS\n");
-    for(;;) {
-      x++;
-      sleep(100);
-    }
-  } else {
-     //parent
-     for(;;) {
-      printf(1, " PARENT pid = %d x = %d\n", getpid(),x);
-      sleep(100);
-    }
-    //wait();
-  }
-
+  printf(1,"\n oochi mama!! JOINED!!!\n");
+  sleep (100);
+  lock(&lock_che);
+  printf(1,"\n Parent Lock Acquired\n");
+  unlock(&lock_che);  
+  printf(1,"\ntid addr is %p\n",&tid);
+  //printf(1,"\nReturn value from lock is %d\n",lock(&lock_che));
+  //printf(1,"\nReturn value from unlock is %d\n",unlock(&lock_che));
+  //for(;;) {
+  //    printf(1, " PARENT pid = %d x = %d\n", getpid(),x);
+  //    sleep(100);
+  //}
+  join();
   exit();
 }

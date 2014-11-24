@@ -1,8 +1,18 @@
 #include "types.h"
 #include "stat.h"
-#include "fcntl.h"
 #include "user.h"
+#include "fs.h"
+#include "fcntl.h"
+#include "syscall.h"
+#include "traps.h"
 #include "x86.h"
+
+//#include "syscall.h"
+//#include "types.h"
+//#include "stat.h"
+//#include "fcntl.h"
+//#include "user.h"
+//#include "x86.h"
 
 char*
 strcpy(char *s, char *t)
@@ -103,3 +113,5 @@ memmove(void *vdst, void *vsrc, int n)
     *dst++ = *src++;
   return vdst;
 }
+
+
