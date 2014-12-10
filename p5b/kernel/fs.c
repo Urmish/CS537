@@ -9,7 +9,6 @@
 // This file contains the low-level file system manipulation 
 // routines.  The (higher-level) system call implementations
 // are in sysfile.c.
-
 #include "types.h"
 #include "defs.h"
 #include "param.h"
@@ -20,6 +19,7 @@
 #include "buf.h"
 #include "fs.h"
 #include "file.h"
+
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 static void itrunc(struct inode*);
@@ -408,11 +408,41 @@ readi(struct inode *ip, char *dst, uint off, uint n)
   if(off + n > ip->size)
     n = ip->size - off;
 
-  for(tot=0; tot<n; tot+=m, off+=m, dst+=m){
-    bp = bread(ip->dev, bmap(ip, off/BSIZE));
-    m = min(n - tot, BSIZE - off%BSIZE);
-    memmove(dst, bp->data + off%BSIZE, m);
-    brelse(bp);
+  if (!(ip->type & T_MIRRORED))
+  {
+    for(tot=0; tot<n; tot+=m, off+=m, dst+=m){
+      bp = bread(ip->dev, bmap(ip, off/BSIZE));
+      m = min(n - tot, BSIZE - off%BSIZE);
+      memmove(dst, bp->data + off%BSIZE, m);
+      brelse(bp);
+    }
+  }
+  if ((ip->type & T_MIRRORED))
+  {
+    //cprintf("\n***** fs.c : reading mirrored file offset is %d n is %d*****\n", off, n);
+    struct buf *bp1;
+    char data0[BSIZE+1], data1[BSIZE+1];
+    int str_idx = 0;
+    for(tot=0; tot<n; tot+=m, off+=m, dst+=m){
+      //cprintf("\n***** fs.c : for loop*****\n");
+      bp = bread(ip->dev, bmap(ip, off/BSIZE));
+      //cprintf("\n***** fs.c : for loop  b_sec %d *****\n", bp->sector);
+      bp1 = bread(ip->dev, bmap(ip, off/BSIZE + 1));
+      //cprintf("\n***** fs.c : for loop  b_sec %d bp1_sec %d*****\n", bp->sector, bp1->sector);
+      m = min(n - tot, BSIZE - off%BSIZE);
+      memmove(data0, bp->data + off%BSIZE, m);
+      memmove(data1, bp1->data + off%BSIZE, m);
+      for (str_idx = 0; str_idx < m; str_idx++)
+      {
+        if (data0[str_idx] != data1[str_idx])
+        {
+          return -1;//indicates that the data read in from two blocks of inode is different
+        }
+      }
+      memmove(dst, bp->data + off%BSIZE, m);
+      brelse(bp);
+      brelse(bp1);
+    }
   }
   return n;
 }
@@ -435,12 +465,32 @@ writei(struct inode *ip, char *src, uint off, uint n)
   if(off + n > MAXFILE*BSIZE)
     n = MAXFILE*BSIZE - off;
 
-  for(tot=0; tot<n; tot+=m, off+=m, src+=m){
-    bp = bread(ip->dev, bmap(ip, off/BSIZE));
-    m = min(n - tot, BSIZE - off%BSIZE);
-    memmove(bp->data + off%BSIZE, src, m);
-    bwrite(bp);
-    brelse(bp);
+  if (!(ip->type & T_MIRRORED))
+  {
+    for(tot=0; tot<n; tot+=m, off+=m, src+=m){
+      bp = bread(ip->dev, bmap(ip, off/BSIZE));
+      m = min(n - tot, BSIZE - off%BSIZE);
+      memmove(bp->data + off%BSIZE, src, m);
+      bwrite(bp);
+      brelse(bp);
+    }
+  }
+  if ((ip->type & T_MIRRORED))
+  {
+    struct buf * bp1;
+    for(tot=0; tot<n; tot+=m, off+=m, src+=m){
+      bp = bread(ip->dev, bmap(ip, off/BSIZE));
+      bp1 = bread(ip->dev, bmap(ip, off/BSIZE + 1));
+      //cprintf("\n***** fs.c : writei : b_sec %d bp1_sec %d*****\n", bp->sector, bp1->sector);
+      m = min(n - tot, BSIZE - off%BSIZE);
+      memmove(bp->data + off%BSIZE, src, m);
+      memmove(bp1->data + off%BSIZE, src, m);
+      //cprintf("\n***** fs.c : writei : b_sec data %s bp1_sec data %s*****\n", bp->data, bp1->data);
+      bwrite(bp);
+      bwrite(bp1);
+      brelse(bp);
+      brelse(bp1);
+    }
   }
 
   if(n > 0 && off > ip->size){
