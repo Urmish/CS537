@@ -226,6 +226,8 @@ create(char *path, short type, short major, short minor)
     ilock(ip);
     if(type == T_FILE && ip->type == T_FILE)
       return ip;
+    if(type == T_MIRRORED && ip->type == T_MIRRORED)
+      return ip;
     iunlockput(ip);
     return 0;
   }

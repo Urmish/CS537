@@ -12,7 +12,9 @@ main(int argc, char *argv[])
   char buffer[513];
   printf(1, "%s", "** Placeholder program for grading scripts **\n");
   int fd = open("lokesh.txt", O_CREATE | O_RDWR | O_MIRRORED);
-  printf(1, "\ntester.c : fd is %d\n", fd);
+  printf(1, "\ntester.c : 1. fd is %d\n", fd);
+  fd = open("lokesh.txt", O_CREATE | O_RDWR | O_MIRRORED);
+  printf(1, "\ntester.c : 2. fd is %d\n", fd);
   printf (1, "\ntester.c : value returned by write is %d\n",write(fd, "Hello!", 6));
 close(fd);
   fd = open("lokesh.txt", O_RDWR );
