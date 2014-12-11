@@ -269,13 +269,13 @@ sys_open(void)
   if(omode & O_CREATE){
     if (!(omode & O_MIRRORED))
     {
-    cprintf("\n*****sysfile.c : Creating file T_FILE %s*****\n", path);
+    //cprintf("\n*****sysfile.c : Creating file T_FILE %s*****\n", path);
     if((ip = create(path, T_FILE, 0, 0)) == 0)
       return -1;
     }
     else
     {
-    cprintf("\n*****sysfile.c : Creating file T_MIRRORED %s*****\n", path);
+    //cprintf("\n*****sysfile.c : Creating file T_MIRRORED %s*****\n", path);
     if((ip = create(path, T_MIRRORED, 0, 0)) == 0)
       return -1;
     }

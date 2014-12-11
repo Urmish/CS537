@@ -425,9 +425,9 @@ readi(struct inode *ip, char *dst, uint off, uint n)
     int str_idx = 0;
     for(tot=0; tot<n; tot+=m, off+=m, dst+=m){
       //cprintf("\n***** fs.c : for loop*****\n");
-      bp = bread(ip->dev, bmap(ip, off/BSIZE));
+      bp = bread(ip->dev, bmap(ip, (off/BSIZE)*2));
       //cprintf("\n***** fs.c : for loop  b_sec %d *****\n", bp->sector);
-      bp1 = bread(ip->dev, bmap(ip, off/BSIZE + 1));
+      bp1 = bread(ip->dev, bmap(ip, (off/BSIZE)*2 + 1));
       //cprintf("\n***** fs.c : for loop  b_sec %d bp1_sec %d*****\n", bp->sector, bp1->sector);
       m = min(n - tot, BSIZE - off%BSIZE);
       memmove(data0, bp->data + off%BSIZE, m);
@@ -479,8 +479,8 @@ writei(struct inode *ip, char *src, uint off, uint n)
   {
     struct buf * bp1;
     for(tot=0; tot<n; tot+=m, off+=m, src+=m){
-      bp = bread(ip->dev, bmap(ip, off/BSIZE));
-      bp1 = bread(ip->dev, bmap(ip, off/BSIZE + 1));
+      bp = bread(ip->dev, bmap(ip, (off/BSIZE)*2));
+      bp1 = bread(ip->dev, bmap(ip, (off/BSIZE)*2 + 1));
       //cprintf("\n***** fs.c : writei : b_sec %d bp1_sec %d*****\n", bp->sector, bp1->sector);
       m = min(n - tot, BSIZE - off%BSIZE);
       memmove(bp->data + off%BSIZE, src, m);
