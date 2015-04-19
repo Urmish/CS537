@@ -1,9 +1,6 @@
-##XV6 Kernel Hacking
+xv6 is a simple UNIX-like operating system. As part of my Intro to Operating systems course, I implemented a number of features to this OS. 
 
-###Changing Scheduler
-Making the kernel more flexible. Using a token based system to assign tasks
-###Changing Stack and Heap Structure
-Changing the Xv6 Kernel to add support for increasing stack and heap sizes by more than 1kB at runtime
-###Adding RAID Support to XV6 Kernel
-Making the File System more robust by adding RAID support
-
+1. Kernel scheduling --> lottery based, similar to popular Web services 
+1. Virtual memory --> null pointer de-referencing and inversion of stack location 
+1. Kernel threads --> Implement support for multi-threaded applications 
+1. File system --> Implement mirrored RAID data protection 
